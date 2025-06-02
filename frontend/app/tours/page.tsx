@@ -1,43 +1,67 @@
-import { Coin } from "@/components/Coin";
-import Tabs from "@/components/Tabs";
+import FilterButton from "@/components/FilterButton";
 import Image from "next/image";
 
-export default function AllQuizes() {
+export default function AllTours() {
   return (
-    <div className="bg-white flex justify-between items-center">
-      <div className="text-white min-w-[320px] min-h-[741px] max-w-[320px] max-h-[741px] bg-black relative">
-          <div className="absolute inset-0 z-10 pointer-events-none">
-            <Image 
-              src="/telek.png" 
-              alt="Decorative overlay"
-              fill
-              className="object-contain opacity-35"
-              style={{ mixBlendMode: 'lighten' }} 
-            />
-          </div>
-        <header className="flex py-5 items-center text-white justify-between mx-4">
-          <div className="flex justify-between items-center">
-            <svg width="12" height="21" viewBox="0 0 12 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 0.5V1.5H8V3.5H6V5.5H4V7.5H2V8.5H1V9.5H0V11.5H1V12.5H2V13.5H4V15.5H6V17.5H7H8V18.5V19.5H10V20.5H12V17.5H10V15.5H8V13.5H6V11.5H4V9.5H6V7.5H8V5.5H10V3.5H12V0.5H10Z" fill="white"/>
-            </svg>
-            <p className="uppercase text-md ml-2">назад</p>
-          </div>
-          <div className="flex">
-            <p className="mr-2">999</p>
-            <Coin />
-          </div>
-        </header>
-        <main className="flex flex-col mx-4">
-          <section className="">
-            <div className="flex justify-between">
-              <h1 className="text-xl uppercase">Квизы</h1>
+    <div className="flex justify-center">
+      <div className=" text-white w-full h-full min-h-[1000px] bg-black relative">
+        <div className="absolute inset-0 z-10 w-full h-full">
+          <Image 
+            className="object-cover"
+            alt="fsd" 
+            fill
+            src={"/moscow.jpg"}
+            quality={100}
+            priority
+          />
+          <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/70 to-transparent"></div>
+    
+          <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/70 to-transparent"></div>
+        </div>
+    
+        <div className="relative z-10 mx-5 py-8 ">
+          <div className="w-full flex justify-between items-center">
+            <div>
+              <FilterButton/>
             </div>
-            <div className="min-h-[200px]">
-              <Tabs />
-            </div>
-          </section>
 
-        </main>
+            <div className="">
+              <Image className="w-40" src={"/logo.png"} alt={"Logo Muroway"} width={1000} height={1000} priority />
+            </div>
+
+            <div>
+              <button className="w-11 h-11 rounded-full bg-white flex justify-center items-center">
+                <Image className="w-5" src={"/favorite.png"} alt={"filter"} width={1000} height={1000} priority />
+              </button>
+            </div>
+            
+            
+            
+          </div>
+          <div className="mt-[550px]">
+            <div className="my-5">
+              <h1 className="my-1 text-2xl font-semibold">Греция. Оливковые холмы и тайны древних холмов</h1>
+              <p className="text-xl">Афины, Пелоннес</p>
+              <p className="text-xl">10 дней 9 ночей</p>
+              <h1 className="my-1 text-4xl font-bold">от 98 000 ₽</h1>
+            </div>
+            <div className="w-full flex gap-4 justify-between ">
+            
+              <button className="min-w-14 min-h-14 max-w-14 max-h-14 rounded-full bg-white flex justify-center items-center">
+                <Image className="w-8" src={"/left.png"} alt={"filter"} width={1000} height={1000} priority />
+              </button>
+              <button className="w-50 text-black text-lg bg-white rounded-lg py-2 px-4">
+                Подробнее
+              </button>
+              <button className="min-w-14 min-h-14 max-w-14 max-h-14 rounded-full bg-white flex justify-center items-center">
+                <Image className="w-8" src={"/like.png"} alt={"filter"} width={1000} height={1000} priority />
+              </button>
+              <button className="min-w-14 min-h-14 max-w-14 max-h-14 rounded-full bg-white flex justify-center items-center">
+                <Image className="w-8" src={"/right.png"} alt={"filter"} width={1000} height={1000} priority />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

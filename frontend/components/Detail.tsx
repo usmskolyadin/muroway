@@ -7,7 +7,6 @@ export default function FilterButton() {
   const [duration, setDuration] = useState<string | null>(null);
   const [activity, setActivity] = useState<string | null>(null);
   console.log(duration)
-
   return (
     <div className="relative">
       {/* Кнопка фильтра */}
