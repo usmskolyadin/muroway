@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function Home() {
   return (
     <div className="flex justify-center">
-      <div className=" text-white w-full h-full min-h-[1000px] bg-black relative">
+      <div className=" text-white w-full h-full bg-black relative">
         <div className="absolute inset-0 z-10 w-full h-full">
           <Image 
             className="object-cover"
@@ -38,7 +38,7 @@ export default function Home() {
             
             
           </div>
-          <div className="mt-[550px]">
+          <div className="mt-[450px]">
             <div className="my-5">
               <h1 className="my-1 text-2xl font-semibold">Греция. Оливковые холмы и тайны древних холмов</h1>
               <p className="text-xl">Афины, Пелоннес</p>
