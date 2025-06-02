@@ -1,0 +1,65 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tour {
+  id          Int      @id @default(autoincrement())
+  title       String
+  price       Float
+  location    String
+  description String
+  durationId  Int
+  duration    Duration @relation(fields: [durationId], references: [id])
+  activityId  Int
+  activity    Activity @relation(fields: [activityId], references: [id])
+  included    String   @db.Text
+  excluded    String   @db.Text
+  accommodation String @db.Text
+  programs    Program[]
+  images      Image[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Duration {
+  id     Int    @id @default(autoincrement())
+  name   String 
+  tours  Tour[]
+}
+
+model Activity {
+  id     Int    @id @default(autoincrement())
+  name   String  
+  tours  Tour[]
+}
+
+model Program {
+  id          Int      @id @default(autoincrement())
+  dayNumber   Int      
+  description String   @db.Text
+  tourId      Int
+  tour        Tour     @relation(fields: [tourId], references: [id])
+  images      Image[]
+}
+
+model Image {
+  id         Int     @id @default(autoincrement())
+  url        String
+  programId  Int?
+  program    Program? @relation(fields: [programId], references: [id])
+  tourId     Int?
+  tour       Tour?    @relation(fields: [tourId], references: [id])
+  isAccommodation Boolean @default(false)
+}
