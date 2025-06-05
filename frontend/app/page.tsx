@@ -23,8 +23,11 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [tgUser, setTgUser] = useState<any>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
+
     if (window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
       const userData = tg.initDataUnsafe?.user || tg.initData || null;
@@ -59,6 +62,13 @@ export default function Home() {
 
   const currentTour = tours[currentIndex];
 
+  if (!isMounted) {
+    return <div className="text-black p-4">Загрузка...</div>;
+  }
+
+  if (!tgUser || tours.length === 0) {
+    return <div className="text-black p-4">Загрузка...</div>;
+  }
   useEffect(() => {
     if (!currentTour || !tgUser) return;
     fetch(`/api/tours/${currentTour.id}/like?userId=${tgUser.id}`)
