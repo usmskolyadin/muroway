@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -24,6 +24,10 @@ export default function Home() {
   const [isLiked, setIsLiked] = useState(false);
   const [tgUser, setTgUser] = useState<any>(null);
   const [isMounted, setIsMounted] = useState(false);
+
+  const currentTour = tours[currentIndex];
+
+  // Все хуки вызываем до любых return
 
   useEffect(() => {
     setIsMounted(true);
@@ -60,7 +64,12 @@ export default function Home() {
       .then((data) => setTours(data));
   }, []);
 
-  const currentTour = tours[currentIndex];
+  useEffect(() => {
+    if (!currentTour || !tgUser) return;
+    fetch(`/api/tours/${currentTour.id}/like?userId=${tgUser.id}`)
+      .then((res) => res.json())
+      .then((data) => setIsLiked(data.liked));
+  }, [currentTour, tgUser]);
 
   if (!isMounted) {
     return <div className="text-black p-4">Загрузка...</div>;
@@ -69,12 +78,10 @@ export default function Home() {
   if (!tgUser || tours.length === 0) {
     return <div className="text-black p-4">Загрузка...</div>;
   }
-  useEffect(() => {
-    if (!currentTour || !tgUser) return;
-    fetch(`/api/tours/${currentTour.id}/like?userId=${tgUser.id}`)
-      .then((res) => res.json())
-      .then((data) => setIsLiked(data.liked));
-  }, [currentTour, tgUser]);
+
+  if (!currentTour) {
+    return <div className="text-black p-4">Загрузка...</div>;
+  }
 
   const toggleLike = async () => {
     if (!currentTour || !tgUser) return;
@@ -93,11 +100,6 @@ export default function Home() {
   const prevTour = () => {
     setCurrentIndex((prev) => (prev - 1 + tours.length) % tours.length);
   };
-
-  if (!tgUser || !currentTour) {
-    return <div className="text-black p-4">Загрузка...</div>;
-  }
-
 
   return (
     <div className="relative text-white w-full h-screen bg-black overflow-hidden">
@@ -158,7 +160,7 @@ export default function Home() {
             <DetailButton />
           </div>
 
-          {/* Кнопка лайка — необязательно */}
+          {/* Кнопка лайка */}
           <button
             onClick={toggleLike}
             className="min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-full bg-white flex justify-center items-center"
