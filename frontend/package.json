@@ -11,7 +11,6 @@
   "dependencies": {
     "-": "^0.0.1",
     "@hookform/resolvers": "^5.0.1",
-    "@premieroctet/next-admin": "^5.4.2",
     "formidable": "^3.5.4",
     "next": "15.3.2",
     "next-auth": "^4.24.11",
@@ -27,7 +26,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@premieroctet/next-admin-generator-prisma": "^1.0.0",
     "@prisma/client": "^6.9.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.17.57",
