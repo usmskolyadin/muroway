@@ -27,34 +27,34 @@ export default function Home() {
 
   const currentTour = tours[currentIndex];
 
-  useEffect(() => {
-    setIsMounted(true);
+  // useEffect(() => {
+  //   setIsMounted(true);
 
-    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      const userData = tg.initDataUnsafe?.user || tg.initData || null;
+  //   if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+  //     const tg = window.Telegram.WebApp;
+  //     const userData = tg.initDataUnsafe?.user || tg.initData || null;
 
-      if (!userData && tg.initData) {
-        const params = new URLSearchParams(tg.initData);
-        const data: any = {};
-        params.forEach((value, key) => (data[key] = value));
+  //     if (!userData && tg.initData) {
+  //       const params = new URLSearchParams(tg.initData);
+  //       const data: any = {};
+  //       params.forEach((value, key) => (data[key] = value));
 
-        fetch("/api/telegram", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then((res) => res.json())
-          .then((json) => {
-            if (json.user) {
-              setTgUser(json.user);
-            }
-          });
-      } else if (userData) {
-        setTgUser(userData);
-      }
-    }
-  }, []);
+  //       fetch("/api/telegram", {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify(data),
+  //       })
+  //         .then((res) => res.json())
+  //         .then((json) => {
+  //           if (json.user) {
+  //             setTgUser(json.user);
+  //           }
+  //         });
+  //     } else if (userData) {
+  //       setTgUser(userData);
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     fetch("/api/tours")

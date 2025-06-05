@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${montserrat.variable}`}>
       <head>
-        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive"/>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="afterInteractive" />
       </head>
       <body
         className={``}
