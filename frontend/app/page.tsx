@@ -26,13 +26,18 @@ export default function Home() {
   const [initData, setInitData] = useState<string | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
-      console.log("Telegram.WebApp.initDataUnsafe.user:", window.Telegram.WebApp.initDataUnsafe?.user);
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
-      setTgUser(user);
-      setInitData(window.Telegram.WebApp.initData);
+    if (typeof window !== "undefined") {
+      console.log("window.Telegram:", window.Telegram);
+      if (window.Telegram?.WebApp) {
+        console.log("WebApp initDataUnsafe.user:", window.Telegram.WebApp.initDataUnsafe?.user);
+        setTgUser(window.Telegram.WebApp.initDataUnsafe?.user);
+        setInitData(window.Telegram.WebApp.initData);
+      } else {
+        console.warn("Telegram WebApp not found");
+      }
     }
   }, []);
+
 
   useEffect(() => {
     fetch("/api/tours")
