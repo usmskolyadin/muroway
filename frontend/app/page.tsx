@@ -27,6 +27,7 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.Telegram?.WebApp) {
+      console.log("Telegram.WebApp.initDataUnsafe.user:", window.Telegram.WebApp.initDataUnsafe?.user);
       const user = window.Telegram.WebApp.initDataUnsafe?.user;
       setTgUser(user);
       setInitData(window.Telegram.WebApp.initData);
