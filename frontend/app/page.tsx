@@ -29,14 +29,17 @@ export default function Home() {
     if (typeof window !== "undefined") {
       console.log("window.Telegram:", window.Telegram);
       if (window.Telegram?.WebApp) {
-        console.log("WebApp initDataUnsafe.user:", window.Telegram.WebApp.initDataUnsafe?.user);
-        setTgUser(window.Telegram.WebApp.initDataUnsafe?.user);
-        setInitData(window.Telegram.WebApp.initData);
+        console.log("WebApp initDataUnsafe:", window.Telegram.WebApp.initDataUnsafe);
+        console.log("WebApp initData:", window.Telegram.WebApp.initData);
+        setTgUser(window.Telegram.WebApp.initDataUnsafe?.user || null);
+        setInitData(window.Telegram.WebApp.initData || null);
+        window.Telegram.WebApp.ready(); // возможно, поможет
       } else {
         console.warn("Telegram WebApp not found");
       }
     }
   }, []);
+
 
 
   useEffect(() => {
