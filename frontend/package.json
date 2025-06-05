@@ -10,22 +10,33 @@
   },
   "dependencies": {
     "-": "^0.0.1",
+    "@hookform/resolvers": "^5.0.1",
+    "@premieroctet/next-admin": "^5.4.2",
+    "formidable": "^3.5.4",
     "next": "15.3.2",
+    "next-auth": "^4.24.11",
+    "next-connect": "^1.0.0",
     "pg": "^8.16.0",
+    "ra-data-simple-rest": "^5.8.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-admin": "^5.8.3",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.57.0",
+    "uuid": "^11.1.0",
+    "zod": "^3.25.51"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@prisma/client": "^6.8.2",
+    "@premieroctet/next-admin-generator-prisma": "^1.0.0",
+    "@prisma/client": "^6.9.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20.17.57",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
-    "prisma": "^6.8.2",
-    "tailwindcss": "^4",
+    "prisma": "^6.9.0",
+    "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
   }
 }

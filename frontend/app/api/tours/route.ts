@@ -1,146 +1,130 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import type { Prisma } from '@prisma/client'
+// app/api/tours/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import path from 'path';
+import fs from 'fs/promises';
 
-type TourWithRelations = Prisma.TourGetPayload<{
-  include: {
-    duration: true
-    activity: true
-    programs: {
-      include: {
-        images: true
-      }
-    }
-    images: true
-  }
-}>
+const prisma = new PrismaClient();
+const uploadDir = path.join(process.cwd(), 'public/uploads');
 
-type CreateTourInput = {
-  title: string
-  price: number
-  location: string
-  description: string
-  durationId: number
-  activityId: number
-  included: string
-  excluded: string
-  accommodation: string
-  programs?: {
-    dayNumber: number
-    description: string
-    images?: {
-      url: string
-      isAccommodation?: boolean
-    }[]
-  }[]
-  images?: {
-    url: string
-    isAccommodation?: boolean
-  }[]
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const _page = Number(searchParams.get('page') || '1');
+  const _perPage = Number(searchParams.get('perPage') || '10');
+  const _sortField = searchParams.get('sortField') || 'id';
+  const _sortOrder = searchParams.get('sortOrder') || 'ASC';
+
+  const skip = (_page - 1) * _perPage;
+  const take = _perPage;
+  const total = await prisma.tour.count();
+
+  const tours = await prisma.tour.findMany({
+    skip,
+    take,
+    orderBy: { [_sortField]: _sortOrder.toLowerCase() === 'asc' ? 'asc' : 'desc' },
+    include: {
+      duration: true,
+      activity: true,
+      programs: { include: { images: true } },
+      images: true,
+    },
+  });
+
+  const start = skip;
+  const end = Math.min(skip + take - 1, total - 1);
+  const contentRange = `items ${start}-${end}/${total}`;
+
+  return NextResponse.json(tours, {
+    status: 200,
+    headers: {
+      'Content-Range': contentRange,
+      'Access-Control-Expose-Headers': 'Content-Range',
+    },
+  });
 }
 
-export async function GET(): Promise<NextResponse<TourWithRelations[] | { error: string }>> {
+export async function POST(req: NextRequest) {
   try {
-    const tours = await prisma.tour.findMany({
+    const formData = await req.formData();
+    await fs.mkdir(uploadDir, { recursive: true });
+
+    const rawData = formData.get('data') as string;
+    const tourData = JSON.parse(rawData);
+    const files = formData.getAll('images');
+    
+    const imageData = await Promise.all(
+      files
+        .filter((file: any) => file && file.name) // ✅ only valid files
+        .map(async (file: any) => {
+          const buffer = Buffer.from(await file.arrayBuffer());
+          const filename = `${Date.now()}-${file.name}`;
+          const filepath = path.join(uploadDir, filename);
+          await fs.writeFile(filepath, buffer);
+          return {
+            url: `/uploads/${filename}`,
+            isAccommodation: false,
+          };
+        })
+    );
+
+    const newTour = await prisma.tour.create({
+      data: {
+        title: tourData.title,
+        price: tourData.price,
+        location: tourData.location,
+        description: tourData.description,
+        durationId: tourData.durationId,
+        activityId: tourData.activityId,
+        included: tourData.included,
+        excluded: tourData.excluded,
+        accommodation: tourData.accommodation,
+        images: {
+          create: imageData 
+        },
+        programs: {
+          create: (tourData.programs ?? []).map((program: any) => ({
+            dayNumber: program.dayNumber,
+            description: program.description,
+          })),
+        },
+      },
+      include: {
+        programs: true,
+      },
+    });
+
+    for (const program of newTour.programs) {
+      const original = tourData.programs.find((p: any) => p.dayNumber === program.dayNumber);
+      if (original?.images?.length) {
+        await prisma.image.createMany({
+          data: original.images.map((img: any) => ({
+            url: img.url,
+            isAccommodation: img.isAccommodation ?? false,
+            programId: program.id,
+          })),
+        });
+      }
+    }
+
+    const tourWithAll = await prisma.tour.findUnique({
+      where: { id: newTour.id },
       include: {
         duration: true,
         activity: true,
-        programs: {
-          include: {
-            images: true
-          }
-        },
-        images: true
-      }
-    })
-    return NextResponse.json(tours)
+        programs: { include: { images: true } },
+        images: true,
+      },
+    });
+
+    return NextResponse.json(tourWithAll, { status: 201 });
   } catch (error) {
-    console.error('Failed to fetch tours:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch tours' },
-      { status: 500 }
-    )
-  }
-}
-
-export async function POST(request: Request): Promise<NextResponse<TourWithRelations | { error: string }>> {
-  try {
-    const tourData: CreateTourInput = await request.json()
-    const { programs, images, ...tourBase } = tourData
-
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient): Promise<TourWithRelations> => {
-      const tour = await tx.tour.create({ 
-        data: {
-          ...tourBase,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        }
-      })
-
-      if (programs?.length) {
-        await Promise.all(
-          programs.map(async (program) => {
-            const { images: programImages, ...programBase } = program
-            const createdProgram = await tx.program.create({
-              data: {
-                ...programBase,
-                tourId: tour.id
-              }
-            })
-
-            if (programImages?.length) {
-              await tx.image.createMany({
-                data: programImages.map(img => ({
-                  ...img,
-                  programId: createdProgram.id,
-                  createdAt: new Date(),
-                  updatedAt: new Date()
-                }))
-              })
-            }
-          })
-        )
-      }
-
-      // Создаем изображения тура
-      if (images?.length) {
-        await tx.image.createMany({
-          data: images.map(img => ({
-            ...img,
-            tourId: tour.id,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }))
-        })
-      }
-
-      const fullTour = await tx.tour.findUnique({
-        where: { id: tour.id },
-        include: {
-          duration: true,
-          activity: true,
-          programs: {
-            include: {
-              images: true
-            }
-          },
-          images: true
-        }
-      })
-
-      if (!fullTour) {
-        throw new Error('Tour not found after creation')
-      }
-
-      return fullTour
-    })
-
-    return NextResponse.json(result, { status: 201 })
-  } catch (error) {
-    console.error('Failed to create tour:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create tour' },
-      { status: 500 }
-    )
+    console.error(error);
+    return NextResponse.json({ error: (error as Error).message }, { status: 400 });
   }
 }

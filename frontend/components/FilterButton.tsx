@@ -10,7 +10,6 @@ export default function FilterButton() {
 
   return (
     <div className="relative">
-      {/* Кнопка фильтра */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-11 h-11 rounded-full bg-white flex justify-center items-center"
@@ -25,9 +24,8 @@ export default function FilterButton() {
         />
       </button>
 
-      {/* Модальное окно */}
       <div className={`
-        fixed inset-0 z-50 max-w-[450px] flex justify-center transition-all duration-300 ease-in-out
+        fixed inset-0 z-[99999] max-w-[450px] flex justify-center transition-all duration-300 ease-in-out
         ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}>
         {/* Затемнение фона */}
@@ -38,9 +36,10 @@ export default function FilterButton() {
         
         {/* Само модальное окно */}
         <div className={`
+          z-50
           absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl
-          h-[90vh] max-h-[90vh] overflow-y-auto pb-6
-          transition-transform duration-300 ease-in-out
+          h-[85vh] max-h-[85vh] overflow-y-auto pb-6
+          transition-transform duration-300 ease-in-out z-50
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}>
           {/* Заголовок и кнопка закрытия */}
@@ -57,10 +56,10 @@ export default function FilterButton() {
             <p className="text-2xl text-gray-900 mt-1">Kirill Pristanskov @kirill_pris</p>
           </div>
 
-          <div className="p-4 space-y-6">
+          <div className="p-4 space-y-6 z-50">
             <div>
-              <h3 className="font-semibold text-xl text-black">Расположение</h3>
-              <div className="mt-2">
+              <h3 className="font-semibold text-xl text-black z-50">Расположение</h3>
+              <div className="mt-2 z-50">
                 <div className="flex items-center  bg-gray-50 rounded-lg text-black">
                   <input 
                     type="text" 
@@ -72,8 +71,8 @@ export default function FilterButton() {
             </div>
 
             <div>
-              <h3 className="font-semibold text-xl text-black">Стоимость</h3>
-              <div className="grid grid-cols-2 ">
+              <h3 className="font-semibold text-xl text-black z-50">Стоимость</h3>
+              <div className="grid grid-cols-2 z-50">
                 <div className="flex text-black items-center bg-gray-50 rounded-lg">
                   <input 
                     type="text" 
@@ -91,8 +90,7 @@ export default function FilterButton() {
               </div>
             </div>
 
-            {/* Блок "Продолжительность тура" */}
-            <div>
+            <div className='z-50'>
               <h3 className="font-semibold text-xl text-black mb-3">Продолжительность тура</h3>
               <div className="grid grid-cols-3 gap-2">
                 {['до 5 дней', 'до 7 дней', 'до 9 дней', 'до 14 дней', '14+ дней'].map((item) => (
@@ -107,10 +105,9 @@ export default function FilterButton() {
               </div>
             </div>
 
-            {/* Блок "Активность тура" */}
-            <div>
-              <h3 className="font-semibold text-xl text-black mb-3">Активность тура</h3>
-              <div className="grid grid-cols-3 gap-2">
+            <div className='z-50'>
+              <h3 className="font-semibold text-xl text-black mb-3 z-50">Активность тура</h3>
+              <div className="grid grid-cols-3 gap-2 z-50">
                 {['умеренная', 'лёгкая', 'интенсивная', 'экстремальная'].map((item) => (
                   <button
                     key={item}
@@ -123,13 +120,12 @@ export default function FilterButton() {
               </div>
             </div>
 
-            {/* Кнопка "Применить" */}
             <button 
               onClick={() => {
                 // Здесь логика применения фильтров
                 setIsOpen(false);
               }}
-              className="w-full py-3.5 bg-[#FE5791] text-white rounded-xl font-medium"
+              className="w-full py-3.5 bg-[#FE5791] text-white rounded-xl font-medium z-50"
             >
               Применить
             </button>

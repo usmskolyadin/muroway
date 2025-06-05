@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Montserrat } from "next/font/google";
+import { ModalProvider } from "@/context/ModalContext";
 
 export const metadata: Metadata = {
   title: "Muroway",
@@ -22,7 +23,9 @@ export default function RootLayout({
       <body
         className={``}
       >
-        {children}
+        <ModalProvider>
+          {children}
+        </ModalProvider>
       </body>
     </html>
   );

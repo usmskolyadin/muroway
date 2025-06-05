@@ -22,21 +22,23 @@ export default function FilterButton() {
       </button>
 
       <div className={`
-        fixed inset-0 z-50 max-w-[450px] flex justify-center transition-all duration-300 ease-in-out
+         h-full inset-0 z-50 max-w-[450px] flex justify-center transition-all duration-300 ease-in-out
         ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
       `}>
-        <div 
-          className="absolute inset-0 bg-black/50"
-          onClick={() => setIsOpen(false)}
-        />
+        <div>
+          <div 
+            className="fixed z-40 absolute inset-0 bg-black/50"
+            onClick={() => setIsOpen(false)}
+          />
+        </div>
         
         <div className={`
-          absolute bottom-0 left-0 right-0 bg-white rounded-2xl
-          h-[332px] max-h-[332px] overflow-y-auto pb-6
+          absolute bg-white rounded-3xl
+          h-full
           transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-y-0' : 'translate-y-full'}
         `}>
-          <div className="sticky top-0 bg-white z-10 pt-4 px-4 pb-2 border-b">
+          <div className="sticky  bg-white z-10 pt-4 px-4 pb-2 border-b">
             <div className="flex justify-between items-center">
               <h2 className="text-3xl text-black font-bold">Наш менеджер свяжется с вами в течении 30 минут</h2>
               <button 
