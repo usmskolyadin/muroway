@@ -6,6 +6,7 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
+
 RUN npx prisma generate
 
 ENV NODE_OPTIONS=--max-old-space-size=4096
