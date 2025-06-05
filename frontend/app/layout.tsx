@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Montserrat } from "next/font/google";
 import { ModalProvider } from "@/context/ModalContext";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Muroway",
@@ -20,6 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${montserrat.variable}`}>
+      <head>
+        <Script src="https://telegram.org/js/telegram-web-app.js" strategy="beforeInteractive"/>
+      </head>
       <body
         className={``}
       >

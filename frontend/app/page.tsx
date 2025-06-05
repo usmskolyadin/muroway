@@ -23,18 +23,33 @@ export default function Home() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [tgUser, setTgUser] = useState<any>(null);
-  const [initData, setInitData] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("window.Telegram:", window.Telegram);
     if (window.Telegram?.WebApp) {
-      console.log("Telegram WebApp available");
-    } else {
-      console.log("Telegram WebApp NOT available");
+      const tg = window.Telegram.WebApp;
+      const userData = tg.initDataUnsafe?.user || tg.initData || null;
+
+      if (!userData && tg.initData) {
+        const params = new URLSearchParams(tg.initData);
+        const data: any = {};
+        params.forEach((value, key) => (data[key] = value));
+
+        fetch("/api/telegram", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((res) => res.json())
+          .then((json) => {
+            if (json.user) {
+              setTgUser(json.user);
+            }
+          });
+      } else if (userData) {
+        setTgUser(userData);
+      }
     }
   }, []);
-
-
 
   useEffect(() => {
     fetch("/api/tours")
@@ -45,16 +60,16 @@ export default function Home() {
   const currentTour = tours[currentIndex];
 
   useEffect(() => {
-    if (!currentTour) return;
-    fetch(`/api/tours/${currentTour.id}/like`)
+    if (!currentTour || !tgUser) return;
+    fetch(`/api/tours/${currentTour.id}/like?userId=${tgUser.id}`)
       .then((res) => res.json())
       .then((data) => setIsLiked(data.liked));
-  }, [currentTour]);
+  }, [currentTour, tgUser]);
 
   const toggleLike = async () => {
-    if (!currentTour || !initData) return;
+    if (!currentTour || !tgUser) return;
 
-    const res = await fetch(`/api/likes?${initData}&tourId=${currentTour.id}`, {
+    const res = await fetch(`/api/likes?userId=${tgUser.id}&tourId=${currentTour.id}`, {
       method: "POST",
     });
     const result = await res.json();
@@ -72,6 +87,7 @@ export default function Home() {
   if (!tgUser || !currentTour) {
     return <div className="text-black p-4">Загрузка...</div>;
   }
+
 
   return (
     <div className="relative text-white w-full h-screen bg-black overflow-hidden">
