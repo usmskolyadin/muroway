@@ -27,12 +27,10 @@ export default function Home() {
 
   const currentTour = tours[currentIndex];
 
-  // Все хуки вызываем до любых return
-
   useEffect(() => {
     setIsMounted(true);
 
-    if (window.Telegram?.WebApp) {
+    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
       const tg = window.Telegram.WebApp;
       const userData = tg.initDataUnsafe?.user || tg.initData || null;
 
@@ -72,14 +70,11 @@ export default function Home() {
   }, [currentTour, tgUser]);
 
   if (!isMounted) {
-    return <div className="text-black p-4">Загрузка...</div>;
+    // Не рендерим UI до монтирования (исключаем расхождение SSR/CSR)
+    return null;
   }
 
-  if (!tgUser || tours.length === 0) {
-    return <div className="text-black p-4">Загрузка...</div>;
-  }
-
-  if (!currentTour) {
+  if (!tgUser || tours.length === 0 || !currentTour) {
     return <div className="text-black p-4">Загрузка...</div>;
   }
 
@@ -146,7 +141,10 @@ export default function Home() {
           <h1 className="my-1 text-2xl font-semibold">{currentTour.title}</h1>
           <p className="text-xl">{currentTour.location}</p>
           <p className="text-xl">{currentTour.duration.name}</p>
-          <h1 className="my-1 text-4xl font-bold">от {Math.floor(currentTour.price).toLocaleString()} ₽</h1>
+          {/* Явно указываем локаль, чтобы сервер и клиент рендерили одинаково */}
+          <h1 className="my-1 text-4xl font-bold">
+            от {Math.floor(currentTour.price).toLocaleString("ru-RU")} ₽
+          </h1>
         </div>
         <div className="w-full flex gap-4 justify-between">
           <button
@@ -160,7 +158,6 @@ export default function Home() {
             <DetailButton />
           </div>
 
-          {/* Кнопка лайка */}
           <button
             onClick={toggleLike}
             className="min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-full bg-white flex justify-center items-center"
@@ -174,7 +171,6 @@ export default function Home() {
             />
           </button>
 
-          {/* Кнопка вперёд */}
           <button
             onClick={nextTour}
             className="min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] rounded-full bg-white flex justify-center items-center"
