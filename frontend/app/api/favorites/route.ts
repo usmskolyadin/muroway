@@ -20,5 +20,6 @@ export async function GET(req: NextRequest) {
   });
 
   const tours = likedTours.map((like) => like.tour);
+  
   return NextResponse.json(tours);
 }

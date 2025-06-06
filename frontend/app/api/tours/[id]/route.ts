@@ -6,6 +6,13 @@ import fs from 'fs/promises';
 const prisma = new PrismaClient();
 const uploadDir = path.join(process.cwd(), 'public/uploads');
 
+interface Program {
+  id: number; 
+  dayNumber: number; 
+  description: string;
+  tourId: number; 
+}
+
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const params = await context.params;
   const id = Number(params.id);
@@ -71,7 +78,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     // Удаление старых изображений и файлов
     const oldImages = await prisma.image.findMany({ where: { tourId: id } });
     await Promise.all(
-      oldImages.map(async (img) => {
+      oldImages.map(async (img: any) => {
         const filePath = path.join(process.cwd(), 'public', img.url);
         try {
           await fs.unlink(filePath);
@@ -108,7 +115,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
 
     if (Array.isArray(tourData.programs)) {
       for (const programInput of tourData.programs) {
-        const program = updatedTour.programs.find(p => p.dayNumber === programInput.dayNumber);
+        const program = updatedTour.programs.find((p: Program) => p.dayNumber === programInput.dayNumber);
         if (!program) continue;
 
         await prisma.image.deleteMany({ where: { programId: program.id } });
