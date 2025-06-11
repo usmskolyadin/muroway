@@ -6,6 +6,7 @@ import DetailButton from "@/components/DetailButton";
 import Favorites from "@/components/Favorites";
 import FilterButton from "@/components/FilterButton";
 import { useModal } from "@/context/ModalContext";
+import TourDetailModal from "@/components/TourDetailModal";
 
 type Tour = {
   id: number;
@@ -70,12 +71,14 @@ export default function Home() {
   }, [currentTour, tgUser]);
 
   if (!isMounted) {
-    // Не рендерим UI до монтирования (исключаем расхождение SSR/CSR)
     return null;
   }
-
-  if (!tgUser || tours.length === 0 || !currentTour) {
-    return <div className="text-black p-4">Загрузка...</div>;
+ 
+  if (!isMounted || tours.length === 0 || !currentTour) {
+    return <div className="text-white text-center mt-10">Загрузка туров...</div>;
+  }
+  if (typeof window !== "undefined" && !window.Telegram?.WebApp) {
+    return <div>Откройте приложение через Telegram-бота.</div>;
   }
 
   const toggleLike = async () => {
@@ -98,6 +101,8 @@ export default function Home() {
 
   return (
     <div className="relative text-white w-full h-screen bg-black overflow-hidden">
+          <TourDetailModal />
+    
       {/* Фоновое изображение */}
       <div className="absolute inset-0 z-1 w-full h-full">
         <Image
@@ -155,7 +160,7 @@ export default function Home() {
           </button>
 
           <div className="z-[9999]">
-            <DetailButton />
+            <DetailButton tourId={currentTour.id}/>
           </div>
 
           <button
