@@ -3,8 +3,8 @@ FROM node:20 AS builder
 WORKDIR /app
 
 COPY package*.json ./
-COPY .env ./
 COPY prisma ./prisma
+COPY .env ./
 
 ENV PRISMA_GENERATE_BINARY_TARGETS=debian-openssl-1.1.x
 
@@ -16,6 +16,7 @@ RUN npx prisma generate
 
 ENV NODE_OPTIONS=--max-old-space-size=4096
 RUN npm run build
+
 
 FROM node:20-slim AS runner
 
