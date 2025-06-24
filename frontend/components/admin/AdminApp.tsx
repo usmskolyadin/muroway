@@ -282,17 +282,16 @@ export const BookingList = () => (
         <TextField source="title" />
       </ReferenceField>
 
-      {/* ✅ Correctly render status as readable label */}
       <FunctionField
         source="status"
         label="Status"
-        render={record => {
-          const statusMap = {
+        render={(record: { status: 'pending' | 'confirmed' | 'canceled' | string }) => {
+          const statusMap: Record<string, string> = {
             pending: 'Pending',
             confirmed: 'Confirmed',
             canceled: 'Canceled',
-          }
-          return statusMap[record.status] || record.status
+          };
+          return statusMap[record.status] || record.status;
         }}
       />
 
@@ -300,7 +299,7 @@ export const BookingList = () => (
       <EditButton />
     </Datagrid>
   </List>
-)
+);
 
 export const BookingEdit = () => (
   <Edit>

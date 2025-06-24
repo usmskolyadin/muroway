@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest, context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id)
+    const params = await context.params;
+    const id = Number(params.id);
 
     const booking = await prisma.booking.findUnique({
       where: { id },
@@ -32,11 +32,12 @@ export async function GET(
 }
 
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest, context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id)
+    const params = await context.params;
+    const id = Number(params.id);
+
     const data = await req.json()
 
     const updated = await prisma.booking.update({
@@ -61,11 +62,12 @@ export async function PUT(
 }
 
 export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest, context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = Number(params.id)
+    const params = await context.params;
+    const id = Number(params.id);
+
 
     await prisma.booking.delete({
       where: { id },

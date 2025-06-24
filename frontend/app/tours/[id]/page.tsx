@@ -22,7 +22,6 @@ export default function Detail() {
         <div className="relative z-10 mx-5 py-8 ">
           <div className="w-full flex justify-between items-center">
             <div>
-              <FilterButton/>
             </div>
 
             <div className="">
