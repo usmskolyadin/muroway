@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import fs from 'fs/promises';
+import { uploadToS3 } from '@/lib/s3';
 
 const prisma = new PrismaClient();
 const uploadDir = path.join(process.cwd(), 'public/uploads');
@@ -45,7 +46,6 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await req.formData();
-      await fs.mkdir(uploadDir, { recursive: true });
 
       const rawData = formData.get('data') as string;
       tourData = JSON.parse(rawData);
@@ -55,13 +55,9 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
         files
           .filter((file: any) => file && file.name)
           .map(async (file: any) => {
-            const buffer = Buffer.from(await file.arrayBuffer());
-            const safeName = file.name.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_.-]/g, '');
-            const filename = `${Date.now()}-${safeName}`;
-            const filepath = path.join(uploadDir, filename);
-            await fs.writeFile(filepath, buffer);
+            const url = await uploadToS3(file);
             return {
-              url: `/uploads/${filename}`,
+              url,
               isAccommodation: false,
             };
           })
@@ -75,20 +71,10 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       );
     }
 
-    // Удаление старых изображений и файлов
-    const oldImages = await prisma.image.findMany({ where: { tourId: id } });
-    await Promise.all(
-      oldImages.map(async (img: any) => {
-        const filePath = path.join(process.cwd(), 'public', img.url);
-        try {
-          await fs.unlink(filePath);
-        } catch {
-          console.warn('File not found:', filePath);
-        }
-      })
-    );
+    // Удаляем старые изображения из базы (но НЕ из S3, т.к. для этого нужна отдельная логика)
+    await prisma.image.deleteMany({ where: { tourId: id } });
 
-    // Обновление тура
+    // Обновляем тур с новыми изображениями
     const updatedTour = await prisma.tour.update({
       where: { id },
       data: {
@@ -102,8 +88,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
         excluded: tourData.excluded,
         accommodation: tourData.accommodation,
         images: {
-          deleteMany: {},
-          create: imageData, // 🔥 FIX HERE
+          create: imageData,
         },
       },
       include: {
@@ -112,7 +97,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       },
     });
 
-
+    // Обновление изображений программ
     if (Array.isArray(tourData.programs)) {
       for (const programInput of tourData.programs) {
         const program = updatedTour.programs.find((p: Program) => p.dayNumber === programInput.dayNumber);

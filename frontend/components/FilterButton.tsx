@@ -2,11 +2,49 @@
 import { useState } from 'react';
 import Image from 'next/image';
 
-export default function FilterButton() {
+const durationOptions = ['1-3 дня', '4-7 дней', '8-14 дней', '15+ дней'];
+
+type Filters = {
+  location?: string;
+  priceMin?: number;
+  priceMax?: number;
+  duration?: string;
+  activity?: string;
+};
+
+type FilterButtonProps = {
+  onApplyFilters: (filters: Filters) => void;
+};
+
+export default function FilterButton({ onApplyFilters }: FilterButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [duration, setDuration] = useState<string | null>(null);
   const [activity, setActivity] = useState<string | null>(null);
-  console.log(duration)
+  const [location, setLocation] = useState('');
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
+
+  const handleApply = () => {
+    const filters: Filters = {
+      location: location.trim() || undefined,
+      priceMin: priceMin ? Number(priceMin) : undefined,
+      priceMax: priceMax ? Number(priceMax) : undefined,
+      duration: duration || undefined,
+      activity: activity || undefined,
+    };
+    onApplyFilters(filters);
+    setIsOpen(false);
+  };
+
+  const resetFilters = () => {
+    setLocation('');
+    setPriceMin('');
+    setPriceMax('');
+    setDuration(null);
+    setActivity(null);
+    onApplyFilters({});
+    setIsOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -24,80 +62,72 @@ export default function FilterButton() {
         />
       </button>
 
-      <div className={`
-        fixed inset-0 z-[99999] max-w-[450px] flex justify-center transition-all duration-300 ease-in-out
-        ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
-      `}>
-        {/* Затемнение фона */}
+      <div className={`fixed inset-0 z-[99999] max-w-[450px] mx-auto flex justify-center transition-all duration-300 ease-in-out
+        ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        
         <div 
           className="absolute inset-0 bg-black/50"
           onClick={() => setIsOpen(false)}
         />
         
-        {/* Само модальное окно */}
-        <div className={`
-          z-50
-          absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl
-          h-[85vh] max-h-[85vh] overflow-y-auto pb-6
-          transition-transform duration-300 ease-in-out z-50
-          ${isOpen ? 'translate-y-0' : 'translate-y-full'}
-        `}>
-          {/* Заголовок и кнопка закрытия */}
+        <div className={`z-50 absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl
+          h-[85vh] max-h-[85vh] overflow-y-auto pb-6 transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}>
+          
           <div className="sticky top-0 bg-white z-10 pt-4 px-4 pb-2 border-b">
             <div className="flex justify-between items-center">
               <h2 className="text-3xl text-black font-bold">Фильтры</h2>
               <button 
                 onClick={() => setIsOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-gray-500 hover:text-gray-700 text-2xl"
               >
                 ✕
               </button>
             </div>
-            <p className="text-2xl text-gray-900 mt-1">Kirill Pristanskov @kirill_pris</p>
           </div>
 
-          <div className="p-4 space-y-6 z-50">
+          <div className="p-4 space-y-6">
             <div>
-              <h3 className="font-semibold text-xl text-black z-50">Расположение</h3>
-              <div className="mt-2 z-50">
-                <div className="flex items-center  bg-gray-50 rounded-lg text-black">
-                  <input 
-                    type="text" 
-                    placeholder="Страна или локация" 
-                    className="w-full bg-transparent  text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
-                  />
-                </div>
+              <h3 className="font-semibold text-xl text-black">Расположение</h3>
+              <div className="mt-2">
+                <input 
+                  type="text" 
+                  placeholder="Страна или локация" 
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full bg-gray-50 text-black text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
+                />
               </div>
             </div>
 
             <div>
-              <h3 className="font-semibold text-xl text-black z-50">Стоимость</h3>
-              <div className="grid grid-cols-2 z-50">
-                <div className="flex text-black items-center bg-gray-50 rounded-lg">
-                  <input 
-                    type="text" 
-                    placeholder="от 0 ₽" 
-                    className="w-full bg-transparent  text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
-                  />
-                </div>
-                <div className="flex text-black items-center p-3 bg-gray-50 rounded-lg">
-                  <input 
-                    type="text" 
-                    placeholder="до 350 000 ₽" 
-                    className="w-full bg-transparent  text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
-                  />
-                </div>
+              <h3 className="font-semibold text-xl text-black">Стоимость</h3>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <input 
+                  type="number" 
+                  placeholder="от 0 ₽" 
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(e.target.value)}
+                  className="w-full bg-gray-50 text-black text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
+                />
+                <input 
+                  type="number" 
+                  placeholder="до 350 000 ₽" 
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(e.target.value)}
+                  className="w-full bg-gray-50 text-black text-sm border border-[#C9CACC] py-3.5 px-4 rounded-2xl"
+                />
               </div>
             </div>
 
-            <div className='z-50'>
-              <h3 className="font-semibold text-xl text-black mb-3">Продолжительность тура</h3>
-              <div className="grid grid-cols-3 gap-2">
-                {['до 5 дней', 'до 7 дней', 'до 9 дней', 'до 14 дней', '14+ дней'].map((item) => (
+            <div>
+              <h3 className="font-semibold text-xl text-black mb-3">Продолжительность</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {durationOptions.map((item) => (
                   <button
                     key={item}
                     onClick={() => setDuration(item)}
-                    className={`px-0.5 py-1.5 rounded-xl text-sm text-center ${activity === item ? 'bg-[#F6F7F8] text-black' : 'bg-[#585B5F]'}`}
+                    className={`py-2 px-3 rounded-xl text-sm text-center ${duration === item ? 'bg-[#FE5791] text-white' : 'bg-gray-100 text-black'}`}
                   >
                     {item}
                   </button>
@@ -105,14 +135,14 @@ export default function FilterButton() {
               </div>
             </div>
 
-            <div className='z-50'>
-              <h3 className="font-semibold text-xl text-black mb-3 z-50">Активность тура</h3>
-              <div className="grid grid-cols-3 gap-2 z-50">
+            <div>
+              <h3 className="font-semibold text-xl text-black mb-3">Активность</h3>
+              <div className="grid grid-cols-2 gap-2">
                 {['умеренная', 'лёгкая', 'интенсивная', 'экстремальная'].map((item) => (
                   <button
                     key={item}
                     onClick={() => setActivity(item)}
-                    className={`px-0.5 py-1.5 rounded-xl text-sm text-center ${activity === item ? 'bg-[#F6F7F8] text-black' : 'bg-[#585B5F]'}`}
+                    className={`py-2 px-3 rounded-xl text-sm text-center ${activity === item ? 'bg-[#FE5791] text-white' : 'bg-gray-100 text-black'}`}
                   >
                     {item}
                   </button>
@@ -120,15 +150,20 @@ export default function FilterButton() {
               </div>
             </div>
 
-            <button 
-              onClick={() => {
-                // Здесь логика применения фильтров
-                setIsOpen(false);
-              }}
-              className="w-full py-3.5 bg-[#FE5791] text-white rounded-xl font-medium z-50"
-            >
-              Применить
-            </button>
+            <div className="flex gap-3">
+              <button 
+                onClick={resetFilters}
+                className="flex-1 py-3.5 bg-gray-200 text-black rounded-xl font-medium"
+              >
+                Сбросить
+              </button>
+              <button 
+                onClick={handleApply}
+                className="flex-1 py-3.5 bg-[#FE5791] text-white rounded-xl font-medium"
+              >
+                Применить
+              </button>
+            </div>
           </div>
         </div>
       </div>

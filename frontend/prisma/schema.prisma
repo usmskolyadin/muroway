@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -41,6 +40,8 @@ model Tour {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   likedBy       LikedTour[]
+  bookings Booking[]
+
 }
 
 model Duration {
@@ -83,4 +84,16 @@ model LikedTour {
   tour Tour @relation(fields: [tourId], references: [id])
 
   @@unique([userId, tourId])
+}
+
+model Booking {
+  id          Int      @id @default(autoincrement())
+  name        String
+  phone       String
+  telegram    String?
+  tourId      Int
+  tour        Tour     @relation(fields: [tourId], references: [id])
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

@@ -24,6 +24,8 @@ import {
   EditProps,
   CreateProps,
   ListProps,
+  EditButton,
+  FunctionField,
 } from "react-admin";
 import simpleRestProvider from "ra-data-simple-rest";
 import dataProvider from "@/lib/dataProvider";
@@ -269,9 +271,61 @@ const ImageCreate: React.FC<CreateProps> = (props) => (
     </SimpleForm>
   </Create>
 );
+export const BookingList = () => (
+  <List>
+    <Datagrid>
+      <TextField source="id" />
+      <TextField source="name" />
+      <TextField source="phone" />
+      <TextField source="telegram" />
+      <ReferenceField source="tourId" reference="tours">
+        <TextField source="title" />
+      </ReferenceField>
+
+      {/* ✅ Correctly render status as readable label */}
+      <FunctionField
+        source="status"
+        label="Status"
+        render={record => {
+          const statusMap = {
+            pending: 'Pending',
+            confirmed: 'Confirmed',
+            canceled: 'Canceled',
+          }
+          return statusMap[record.status] || record.status
+        }}
+      />
+
+      <DateField source="createdAt" showTime />
+      <EditButton />
+    </Datagrid>
+  </List>
+)
+
+export const BookingEdit = () => (
+  <Edit>
+    <SimpleForm>
+      <TextInput source="name" fullWidth />
+      <TextInput source="phone" fullWidth />
+      <TextInput source="telegram" fullWidth />
+      <ReferenceInput source="tourId" reference="tours">
+        <SelectInput optionText="title" />
+      </ReferenceInput>
+      <SelectInput
+        source="status"
+        choices={[
+          { id: 'pending', name: 'Pending' },
+          { id: 'confirmed', name: 'Confirmed' },
+          { id: 'canceled', name: 'Canceled' },
+        ]}
+      />
+    </SimpleForm>
+  </Edit>
+)
 
 const AdminApp: React.FC = () => (
   <Admin dataProvider={dataProvider}>
+    <Resource name="bookings" list={BookingList} edit={BookingEdit} />
     <Resource name="tours" list={TourList} edit={TourEdit} create={TourCreate} />
     <Resource name="durations" list={DurationList} edit={DurationEdit} create={DurationCreate} />
     <Resource name="activities" list={ActivityList} edit={ActivityEdit} create={ActivityCreate} />

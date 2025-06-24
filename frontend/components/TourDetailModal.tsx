@@ -81,7 +81,7 @@ export default function TourDetailModal() {
             </div>
             <h3 className="font-semibold text-2xl text-black">Программа</h3>
             <Accordion programs={tour.programs} />
-            <BookingModal />
+            <BookingModal tourId={tour.id} tourTitle={tour.title} />
           </div>
         </div>
       </div>

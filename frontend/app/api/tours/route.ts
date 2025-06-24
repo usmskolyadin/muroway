@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import fs from 'fs/promises';
+import { uploadToS3 } from '@/lib/s3';
 
 const prisma = new PrismaClient();
 const uploadDir = path.join(process.cwd(), 'public/uploads');
@@ -52,27 +53,25 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    await fs.mkdir(uploadDir, { recursive: true });
 
     const rawData = formData.get('data') as string;
     const tourData = JSON.parse(rawData);
+
     const files = formData.getAll('images');
-    
+
     const imageData = await Promise.all(
       files
-        .filter((file: any) => file && file.name) // ✅ only valid files
+        .filter((file: any) => file && file.name)
         .map(async (file: any) => {
-          const buffer = Buffer.from(await file.arrayBuffer());
-          const filename = `${Date.now()}-${file.name}`;
-          const filepath = path.join(uploadDir, filename);
-          await fs.writeFile(filepath, buffer);
+          const url = await uploadToS3(file);
           return {
-            url: `/uploads/${filename}`,
+            url,
             isAccommodation: false,
           };
         })
     );
 
+    // Создаем тур с изображениями из S3
     const newTour = await prisma.tour.create({
       data: {
         title: tourData.title,
@@ -85,7 +84,7 @@ export async function POST(req: NextRequest) {
         excluded: tourData.excluded,
         accommodation: tourData.accommodation,
         images: {
-          create: imageData 
+          create: imageData,
         },
         programs: {
           create: (tourData.programs ?? []).map((program: any) => ({
