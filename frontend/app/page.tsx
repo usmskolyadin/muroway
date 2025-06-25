@@ -127,7 +127,6 @@ export default function Home() {
     <div className="relative text-white w-full h-screen bg-black overflow-hidden">
       <TourDetailModal />
       
-      {/* Фоновое изображение */}
       <div className="absolute inset-0 z-1 w-full h-full">
         {currentTour.images[0]?.url && (
           <Image
@@ -137,6 +136,10 @@ export default function Home() {
             src={currentTour.images[0].url}
             quality={100}
             priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 100vw"
+            onError={(e) => {
+              console.error('Image load error:', e);
+            }}
           />
         )}
         <div className="absolute inset-x-0 top-0 h-1/4 bg-gradient-to-b from-black/70 to-transparent" />
