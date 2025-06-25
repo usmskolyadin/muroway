@@ -130,6 +130,7 @@ export default function Home() {
       <div className="absolute inset-0 z-1 w-full h-full">
         {currentTour.images[0]?.url && (
           <Image
+            unoptimized
             className="object-cover"
             alt={currentTour.title}
             fill
