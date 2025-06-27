@@ -36,7 +36,7 @@ export default function FilterButton() {
         className="w-11 h-11 rounded-full bg-white flex justify-center items-center"
       >
         <Image
-          unoptimized
+          
           className="w-5"
           src={"/favorite.png"}
           alt={"filter"}
@@ -78,6 +78,7 @@ export default function FilterButton() {
             <div className="m-4" key={tour.id}>
               <div className="relative w-[165px] h-[165px]">
                 <Image 
+                  unoptimized
                   className="object-cover rounded-2xl"
                   src={tour.images[0].url}
                   alt={tour.title}

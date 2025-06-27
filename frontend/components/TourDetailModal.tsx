@@ -60,7 +60,7 @@ export default function TourDetailModal() {
               </div>
             </div>
           </div>
-          <Image className='min-h-[320px] max-h-[320px] object-cover' src={tour.images[0]?.url} alt={''}  quality={100} fill />
+          <Image unoptimized className='min-h-[320px] max-h-[320px] object-cover' src={tour.images[0]?.url} alt={''}  quality={100} fill />
           <div className="mx-4 mt-[285px]">
             <h3 className="font-semibold text-2xl text-black">{tour.title}</h3>
             <TourDescription description={tour.description}>
