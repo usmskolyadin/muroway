@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
+import DetailButton from './DetailButton';
 
 type Tour = {
   id: number;
@@ -17,14 +18,19 @@ export default function FilterButton() {
   const [tours, setTours] = useState<Tour[]>([]);
 
   useEffect(() => {
-    fetch("/api/favorites")
+    const stored = sessionStorage.getItem("likedTours");
+    const likedIds = stored ? JSON.parse(stored) as number[] : [];
+
+    fetch("/api/tours")
       .then((res) => res.json())
-      .then((data) => setTours(data));
-  }, []);
+      .then((allTours) => {
+        const liked = allTours.filter((tour: Tour) => likedIds.includes(tour.id));
+        setTours(liked);
+      });
+  }, [isOpen]);
 
   return (
     <div className="relative">
-      {/* Кнопка фильтра */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
         className="w-11 h-11 rounded-full bg-white flex justify-center items-center"
@@ -66,17 +72,20 @@ export default function FilterButton() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 mx-2">
+          <div className="grid grid-cols-2 ">
             {tours.map((tour) => (
-            <div key={tour.id} className=" mt-2 m-2">
-              <div className=" max-w-[165px] max-h-[165px] min-w-[165px] min-h-[165px]">
+            <div className="m-4" key={tour.id}>
+              <div className="relative w-[165px] h-[165px]">
                 <Image 
-                  className="max-w-[165px] min-w-[165px] max-h-[165px] min-h-[165px] object-cover rounded-2xl " 
-                  src={'/moscow.jpg'} 
-                  alt={''} 
+                  className="object-cover rounded-2xl"
+                  src={tour.images[0].url}
+                  alt={tour.title}
+                  fill
                 />
               </div>
-              <p className="text-md mt-2 text-black font-medium">{tour.title}</p>
+              <p className="mt-2 text-md text-black font-medium w-[165px] mb-2">{tour.title}</p>
+              <DetailButton tourId={tour.id}/>
+              
             </div>
              ))}
           </div>

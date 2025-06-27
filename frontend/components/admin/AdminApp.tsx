@@ -329,7 +329,7 @@ const AdminApp: React.FC = () => (
     <Resource name="durations" list={DurationList} edit={DurationEdit} create={DurationCreate} />
     <Resource name="activities" list={ActivityList} edit={ActivityEdit} create={ActivityCreate} />
     <Resource name="programs" list={ProgramList} edit={ProgramEdit} create={ProgramCreate} />
-    <Resource name="images" list={ImageList} edit={ImageEdit} create={ImageCreate} />
+    {/* <Resource name="images" list={ImageList} edit={ImageEdit} create={ImageCreate} /> */}
   </Admin>
 );
 

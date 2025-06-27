@@ -33,65 +33,57 @@ export default function Home() {
   const [tgUser, setTgUser] = useState<any>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [filters, setFilters] = useState<Filters>({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   const currentTour = tours[currentIndex];
 
   useEffect(() => {
-    setIsMounted(true);
-    fetchTours();
-    
-    if (typeof window !== "undefined" && window.Telegram?.WebApp) {
-      const tg = window.Telegram.WebApp;
-      const userData = tg.initDataUnsafe?.user || null;
-      if (userData) setTgUser(userData);
-    }
-  }, []);
+    if (!currentTour) return;
+    const stored = sessionStorage.getItem("likedTours");
+    const likedIds = stored ? JSON.parse(stored) as number[] : [];
+    setIsLiked(likedIds.includes(currentTour.id));
+  }, [currentTour]);
 
   useEffect(() => {
+    setIsMounted(true);
     fetchTours();
-  }, [filters]);
+  }, []);
 
-  const fetchTours = async () => {
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams();
-      
-      if (filters.location) params.append('location', filters.location);
-      if (filters.priceMin) params.append('priceMin', filters.priceMin.toString());
-      if (filters.priceMax) params.append('priceMax', filters.priceMax.toString());
-      if (filters.duration) params.append('duration', filters.duration);
-      if (filters.activity) params.append('activity', filters.activity);
+  async function fetchTours() {
+    setLoading(true);
+    const params = new URLSearchParams();
+    if (filters.location) params.append('location', filters.location);
+    if (filters.priceMin !== undefined) params.append('priceMin', filters.priceMin.toString());
+    if (filters.priceMax !== undefined) params.append('priceMax', filters.priceMax.toString());
+    if (filters.duration) params.append('duration', filters.duration);
+    if (filters.activity) params.append('activity', filters.activity);
 
-      const response = await fetch(`/api/tours?${params.toString()}`);
-      const data = await response.json();
-      
-      setTours(data);
-      setCurrentIndex(0);
-    } catch (error) {
-      console.error('Error fetching tours:', error);
-    } finally {
-      setIsLoading(false);
+    const res = await fetch(`/api/tours?${params}`);
+    const data = await res.json();
+    setTours(data);
+    setCurrentIndex(0);
+    setLoading(false);
+  }
+
+  const toggleLike = () => {
+    if (!currentTour) return;
+
+    const stored = sessionStorage.getItem("likedTours");
+    const likedIds = stored ? JSON.parse(stored) as number[] : [];
+
+    let updated: number[];
+
+    if (likedIds.includes(currentTour.id)) {
+      updated = likedIds.filter((id) => id !== currentTour.id);
+      setIsLiked(false);
+    } else {
+      updated = [...likedIds, currentTour.id];
+      setIsLiked(true);
     }
+
+    sessionStorage.setItem("likedTours", JSON.stringify(updated));
   };
 
-  const handleApplyFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
-  };
-
-  const toggleLike = async () => {
-    if (!currentTour || !tgUser?.id) return;
-
-    try {
-      const res = await fetch(`/api/likes?userId=${tgUser.id}&tourId=${currentTour.id}`, {
-        method: "POST",
-      });
-      const result = await res.json();
-      setIsLiked(result.liked);
-    } catch (error) {
-      console.error('Error toggling like:', error);
-    }
-  };
 
   const nextTour = () => {
     setCurrentIndex((prev) => (prev + 1) % tours.length);
@@ -126,7 +118,6 @@ export default function Home() {
   return (
     <div className="relative text-white w-full h-screen bg-black overflow-hidden">
       <TourDetailModal />
-      
       <div className="absolute inset-0 z-1 w-full h-full">
         {currentTour.images[0]?.url && (
           <Image
@@ -147,12 +138,11 @@ export default function Home() {
         <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/70 to-transparent" />
       </div>
 
-      {/* Верхняя панель */}
       {!isDetailOpen && (
         <div className="relative mx-5 py-8">
           <div className="w-full flex justify-between items-center">
             <div className="relative z-5">
-              <FilterButton onApplyFilters={handleApplyFilters} />
+             <FilterButton onApplyFilters={setFilters} />
             </div>
             <div className="z-5">
               <Image
@@ -171,7 +161,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* Информация о туре */}
       <div className="absolute bottom-0 z-1 w-full max-w-screen-sm px-4 pb-10 mx-auto left-0 right-0">
         <div className="my-5">
           <h1 className="my-1 text-2xl font-semibold">{currentTour.title}</h1>
@@ -200,8 +189,8 @@ export default function Home() {
             className="min-w-[56px] min-h-[56px] rounded-full bg-white flex justify-center items-center"
           >
             <Image
-              className="w-8"
-              src={isLiked ? "/like-filled.png" : "/like.png"}
+              className={isLiked ? "w-8 grayscale brightness-75" : "w-8"}
+              src={"/like.png"}
               alt="Like"
               width={1000}
               height={1000}
