@@ -36,6 +36,7 @@ export default function FilterButton() {
         className="w-11 h-11 rounded-full bg-white flex justify-center items-center"
       >
         <Image
+          unoptimized
           className="w-5"
           src={"/favorite.png"}
           alt={"filter"}
