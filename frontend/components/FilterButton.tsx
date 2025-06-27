@@ -56,7 +56,7 @@ export default function FilterButton({ onApplyFilters }: FilterButtonProps) {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-50 flex justify-center items-end md:items-center p-4 text-black">
+        <div className="fixed inset-0 z-50 flex justify-center items-end md:items-center text-black">
           <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
 
           <div className="relative bg-white w-full max-w-md rounded-t-2xl md:rounded-2xl overflow-y-auto max-h-[90vh] p-6 space-y-6">
@@ -80,7 +80,6 @@ export default function FilterButton({ onApplyFilters }: FilterButtonProps) {
             <div>
               <h3 className="font-semibold text-lg text-black">Стоимость (₽)</h3>
 
-              {/* Поля от / до */}
               <div className="flex gap-2 mt-4 mb-2">
                 <input
                   type="number"

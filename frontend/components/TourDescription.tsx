@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function TourDescription({ description }: Promise<string>) {
+export default function TourDescription({ description }: { description: string }) {
   const [expanded, setExpanded] = useState<boolean>(false);
 
   return (
@@ -13,7 +13,6 @@ export default function TourDescription({ description }: Promise<string>) {
         {description}
       </p>
 
-      {/* Кнопка "Читать всё" */}
       {!expanded && (
         <div className="flex w-full justify-end mt-1">
           <button
